@@ -3,7 +3,7 @@ use png::{BitDepth, ColorType, Encoder, EncodingError};
 pub struct Image {
   width: u32,
   height: u32,
-  rgba: Vec<u8>,
+  pub owned_rgba: Vec<u8>,
 }
 
 impl Image {
@@ -11,7 +11,7 @@ impl Image {
     Image {
       width,
       height,
-      rgba,
+      owned_rgba: rgba,
     }
   }
 
@@ -53,7 +53,7 @@ impl Image {
   }
 
   pub fn rgba(&self) -> &Vec<u8> {
-    &self.rgba
+    &self.owned_rgba
   }
 
   pub fn to_png(&self) -> Result<Vec<u8>, EncodingError> {
@@ -64,7 +64,7 @@ impl Image {
     encoder.set_depth(BitDepth::Eight);
 
     let mut writer = encoder.write_header()?;
-    writer.write_image_data(&self.rgba)?;
+    writer.write_image_data(&self.owned_rgba)?;
     writer.finish()?;
 
     Ok(buffer)
@@ -73,6 +73,6 @@ impl Image {
 
 impl Into<Vec<u8>> for Image {
   fn into(self) -> Vec<u8> {
-    self.rgba
+    self.owned_rgba
   }
 }
